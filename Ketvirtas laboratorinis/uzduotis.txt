@@ -1,0 +1,6 @@
+𝑚1=120kg masės parašiutininkas su 𝑚2=10kg masės įranga iššoka iš lėktuvo, kuris skrenda aukštyje ℎ0=2800m. Po 𝑡𝑔=25s
+laisvo kritimo parašiutas išskleidžiamas. Oro pasipriešinimo koeficientas laisvo kritimo metu lygus 𝑘1=0,25kg/m, o 
+išskleidus parašiutą - 𝑘2=10kg/m. Tariama, kad paliekant lėktuvą parašiutininko greitis lygus 0 m/s, o oro 
+pasipriešinimas proporcingas parašiutininko greičio kvadratui. Raskite, kaip kinta parašiutininko greitis nuo 0 
+s iki nusileidimo. Kada ir kokiu greičiu parašiutininkas pasiekia žemę? Kokiame aukštyje išskleidžiamas 
+parašiutas?
