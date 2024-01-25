@@ -1,0 +1,20 @@
+Pagal pateiktą uždavinio sąlygą sudarykite tikslo funkciją ir išspręskite jį vienu iš gradientinių 
+metodų (gradientiniu, greičiausio nusileidimo). Gautą taškų konfigūraciją pavaizduokite programoje, 
+skirtingais ženklais pavaizduokite duotus ir pridėtus (jei sąlygoje tokių yra) taškus.                                                                                                                                                        
+ Uzduotis:            
+Miestas išsidėstęs kvadrate, kurio koordinatės (−10 ≤ 𝒙 ≤ 10, −10 ≤ 𝒚 ≤ 10). Mieste yra n (𝒏 ≥ 𝟑) vieno 
+tinklo parduotuvių, kurių koordinatės yra žinomos (Koordinatės gali būti generuojamos atsitiktinai, negali būti 
+kelios parduotuvės toje pačioje vietoje). Planuojama pastatyti dar m (𝒎 ≥ 𝟑) šio tinklo parduotuvių. Parduotuvės 
+pastatymo kaina (vietos netinkamumas) vertinama pagal atstumus iki kitų parduotuvių ir miesto ribos. Reikia 
+parinkti naujų parduotuvių vietas (koordinates) taip, kad parduotuvių pastatymo kainų suma būtų kuo mažesnė. 
+Atstumo tarp dviejų parduotuvių, kurių koordinatės (𝒙𝟏, 𝒚𝟏) ir (𝒙𝟐, 𝒚𝟐), kaina apskaičiuojama pagal formulę:
+𝐶(𝑥1, 𝑦1, 𝑥2, 𝑦2) = exp(−0.1 * ((𝑥1 − 𝑥2)**2 + (𝑦1 − 𝑦2)**2))
+Atstumo tarp parduotuvės, kurios koordinatės (𝒙𝟏, 𝒚𝟏), ir artimiausio miesto ribos taško, kurio koordinatės (𝒙𝒓, 𝒚𝒓), kaina apskaičiuojama pagal formulę: 
+𝐶**R(𝑥1, 𝑦1, 𝑥𝑟, 𝑦𝑟) = {0,𝑗𝑒𝑖𝑔𝑢 𝑝𝑎𝑟𝑑𝑢𝑜𝑡𝑢𝑣ę 𝑝𝑙𝑎𝑛𝑢𝑜𝑗𝑎𝑚𝑎 𝑠𝑡𝑎𝑡𝑦𝑡𝑖 𝑚𝑖𝑒𝑠𝑡𝑜 𝑟𝑖𝑏𝑜𝑠𝑒
+                                            {0.5 ∙ ((𝑥1 − 𝑥𝑟)**2 + (𝑦1 − 𝑦𝑟)**2), 𝑘𝑖𝑡𝑎𝑖𝑠 𝑎𝑡𝑣𝑒𝑗𝑎𝑖s                                                                              
+
+
+Ataskaitoje pateikite 
+pradinę ir gautą taškų konfigūracijas, taikytos tikslo funkcijos aprašymą, taikyto metodo pavadinimą ir 
+parametrus, iteracijų skaičių, iteracijų pabaigos sąlygas ir tikslo funkcijos priklausomybės nuo iteracijų 
+skaičiaus grafiką

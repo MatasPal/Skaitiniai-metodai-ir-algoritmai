@@ -1,0 +1,60 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Pradinės sąlygos
+n = 5  # Parduotuvių skaičius
+m = 3  # Planuojamų parduotuvių skaičius
+miesto_ribos = 10  # Miesto ribos dydis
+
+# Sugeneruojame pradines parduotuvių koordinates
+pradines_parduotuves = np.random.rand(n, 2) * 20 - 10  # Koordinatės nuo -10 iki 10
+
+# Sugeneruojame pradines naujų parduotuvių koordinates
+naujos_parduotuves = np.random.rand(m, 2) * 20 - 10  # Koordinatės nuo -10 iki 10
+
+# Apskaičiuojame pastatytų parduotuvių vietos netinkamumo kainą
+def pastatytu_parduotuviu_kaina(parduotuves):
+    kaina = 0
+    for i in range(len(parduotuves)):
+        for j in range(len(parduotuves)):
+            if i != j:
+                kaina += np.exp(-0.1 * ((parduotuves[i][0] - parduotuves[j][0])**2 + (parduotuves[i][1] - parduotuves[j][1])**2))
+        kaina += 0.5 * ((miesto_ribos - parduotuves[i][0])**2 + (miesto_ribos - parduotuves[i][1])**2)
+    return kaina
+
+# Gradientinio nusileidimo metodas
+def gradientinis_nusileidimas(parduotuves, m, miesto_ribos, mokymo_zingsnis, iteraciju_skaicius):
+    kainos = []
+    for _ in range(iteraciju_skaicius):
+        gradientas = np.zeros((m, 2))
+        for i in range(m):
+            for j in range(m):
+                if i != j:
+                    gradientas[i] += 0.2 * (parduotuves[i] - parduotuves[j]) * np.exp(-0.1 * ((parduotuves[i][0] - parduotuves[j][0])**2 + (parduotuves[i][1] - parduotuves[j][1])**2))
+            gradientas[i] += 0.1 * (parduotuves[i] - miesto_ribos) * np.exp(-0.1 * ((parduotuves[i][0] - miesto_ribos)**2 + (parduotuves[i][1] - miesto_ribos)**2))
+        parduotuves -= mokymo_zingsnis * gradientas
+        kainos.append(pastatytu_parduotuviu_kaina(parduotuves))
+    return parduotuves, kainos
+
+# Nustatome optimizavimo parametrus
+mokymo_zingsnis = 0.01
+iteraciju_skaicius = 100
+
+# Vykdome gradientinio nusileidimo metodą
+parduotuves, kainos = gradientinis_nusileidimas(naujos_parduotuves, m, miesto_ribos, mokymo_zingsnis, iteraciju_skaicius)
+
+# Pavaizduojame rezultatus
+plt.scatter(pradines_parduotuves[:, 0], pradines_parduotuves[:, 1], c='r', marker='x', label='Pradinės parduotuvės')
+plt.scatter(naujos_parduotuves[:, 0], naujos_parduotuves[:, 1], c='b', marker='o', label='Naujos parduotuvės')
+plt.scatter(parduotuves[:, 0], parduotuves[:, 1], c='g', marker='s', label='Optimizuotos parduotuvės')
+plt.xlim(-10, 10)
+plt.ylim(-10, 10)
+plt.legend()
+plt.title("Parduotuvių vietos")
+plt.show()
+
+plt.plot(kainos)
+plt.xlabel('Iteracijos')
+plt.ylabel('Kaina')
+plt.title('Kainos mažėjimas per iteracijas')
+plt.show()
