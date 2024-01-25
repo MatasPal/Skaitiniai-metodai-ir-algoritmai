@@ -1,0 +1,52 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def fnk(x): 
+    f=2*x**2-1 
+    return f;
+
+xn=0;
+xn1=2;
+xrange=[-3,3]; 
+maxiter=10
+xxx=np.linspace(xrange[0],xrange[1],150)
+plt.plot(xxx,fnk(xxx),'b-')
+plt.plot(xrange,[0,0],'k--')
+plt.plot(xn,[0],'sc')
+plt.plot(xn1,[0],'sm')
+plt.show()
+
+xmid1=xn
+for i in (range (maxiter)):
+    xxx=np.linspace(xrange[0],xrange[1],150)
+    plt.plot(xxx,fnk(xxx),'b-')
+    plt.plot(xrange,[0,0],'k--')
+    plt.plot(xn,[0],'sc')
+    plt.plot(xn1,[0],'sm')
+    plt.xlabel('x')
+    plt.ylabel('f(x)')
+    xmid=(xn+xn1)/2
+    if np.sign(fnk(xmid)) == np.sign(fnk(xn1)):
+        xn1=xmid
+    else:
+        xn=xmid
+        
+    tikslumas_f=np.abs(fnk(xmid))
+    vardiklis=np.abs(xmid1)+np.abs(xmid)
+    if vardiklis < 1e-6:
+        tikslumas_x=np.abs(xmid1-xmid)
+    else:
+        tikslumas_x=np.abs(xmid1-xmid)/vardiklis
+    
+
+    
+    plt.plot(xmid,[0],'sk')
+    plt.show()
+    print('iteracija= ',i,'xmid= ',xmid,'tikslumas_x',tikslumas_x,'tikslumas_f',tikslumas_f);
+
+    if (tikslumas_f < 1e-6) & (tikslumas_x < 1e-6):
+        print('Saknis surasta'); break
+    else:
+        if i == maxiter-1: print('Saknies tikslumas nepasiektas');
+    xmid1=xmid
+    

@@ -1,0 +1,52 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import sympy as sp
+import math
+
+def fnk(x): return sp.sin(x**2)-0.5
+
+def Taylor(f,x,x0,N):
+    fp=f.subs(x,x0);
+    df=f;
+    for i in range(1,N):
+        df=df.diff(x)
+        fp=fp+df.subs(x,x0)*(x-x0)**i/math.factorial(i)
+    return fp
+
+x,fp=sp.symbols("x fp")
+print(fnk(x))
+
+xmin=-2; 
+xmax=2;
+npoints=200;
+x0=0;
+N=18;
+
+xxx=np.linspace(xmin, xmax, npoints)
+fff=[];
+for i in range(npoints): fff.append(fnk(x).subs(x, xxx[i]))
+plt.plot(xxx,fff,'b-');plt.plot([xmin,xmax], [0,0],'k--');plt.grid()
+plt.xlabel('x');plt.ylabel('fnk, TE');
+
+TE=Taylor(fnk(x),x,x0,N); 
+print(TE);
+
+fff=[];
+for i in range(npoints): fff.append(TE.subs(x, xxx[i]))
+plt.plot(xxx,fff,'r-');
+
+a=sp.Poly(TE)
+print(a)
+koef=np.array(a.all_coeffs())
+print(koef)
+saknys=np.roots(koef)
+print('kompleksines saknys')
+print(saknys)
+print('realios saknys')
+rsaknys=[];
+for i in range(len(saknys)):
+    if saknys[i].imag == 0:
+        rsaknys.append(saknys[i].real)
+        print(saknys[i].real)
+
+plt.plot(rsaknys,np.zeros(len(rsaknys)),'mp')

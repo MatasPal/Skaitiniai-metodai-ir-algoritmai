@@ -1,0 +1,25 @@
+import numpy as np
+import sympy as sp
+import matplotlib.pyplot as plt
+from scipy.optimize import fsolve
+
+# 1. Aprašyti funkciją h(x):
+x = sp.symbols('x')
+h_expr = 154 * sp.sin(x) - 9 + 2 * np.power(x, 2)
+h = sp.lambdify(x, h_expr, 'numpy')  # Konvertuojame simbolinį reiškinį į funkciją
+
+# 2. Apskaičiuoti funkcijos h(x) šaknis naudojant NumPy funkciją fsolve (niutono metodas):
+initial_guesses = [1.0, 2.0, 3.0]  # Pradiniai spėjimai
+roots_h = [float(root) for root in fsolve(h, initial_guesses)]
+
+# 3. Pavaizduoti tik funkcijos h(x) grafiką:
+x_values = np.linspace(-2, 8, 400)  # Interpoliavimo intervalas
+
+plt.figure(figsize=(10, 6))
+plt.plot(x_values, [h(val) for val in x_values], label='h(x)', linewidth=2, color='blue')  # Pvz., naudojant mėlyną spalvą
+plt.xlabel('x')
+plt.ylabel('y')
+plt.legend()
+plt.title('Funkcijos h(x) grafikas')
+plt.grid(True)
+plt.show()

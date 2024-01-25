@@ -1,0 +1,124 @@
+import numpy as np 
+import matplotlib.pyplot as plt 
+import math 
+def fx(x):
+    return 2.19 * np.power(x, 4) - 5.17 * np.power(x, 3) - 7.17 * np.power(x, 2) + 15.14 * x + 1.21 
+def root_intervals(f, x_min, x_max, step):
+    intervals = []
+    current_x = x_min
+    while current_x < x_max:
+        if np.sign(f(current_x)) != np.sign(f(current_x + step)):
+            plt.plot([current_x], [0], 'or')
+            plt.plot([current_x + step], [0], 'og')
+            intervals.append({"xMin": round(current_x, 2), "xMax": round(current_x + step, 2)})
+        current_x += step
+    return intervals 
+
+
+
+def chords(f, ranges, epsilon, iteration_max):
+    roots = []
+    for current_range in ranges:
+        out_of_range = False
+        current_iteration = 0
+        x_min = float(current_range["xMin"])
+        x_max = float(current_range["xMax"])
+        k = np.abs(f(x_min) / f(x_max))
+        x_mid = (x_min + k * x_max) / (1 + k)
+        x_mid_n1 = x_mid + epsilon * 2  # used to enter while for the first time
+        while np.abs(x_mid - x_mid_n1) > epsilon or np.abs(f(x_mid)) > epsilon:  # absoliutinis sprendinio tikslumo ivertis
+            current_iteration += 1
+            if current_iteration > iteration_max:
+                print(f"Chords method has reached the maximum iteration count - {iteration_max}")
+                roots.append({"range": current_range, "root": x_mid, "iteration": current_iteration})
+                out_of_range = True
+                break
+            if np.sign(f(x_min)) == np.sign(f(x_mid)):
+                x_min = x_mid
+            else:
+                x_max = x_mid
+                x_mid_n1 = x_mid
+                k = np.abs(f(x_min) / f(x_max))
+                x_mid = (x_min + k * x_max) / (1 + k)
+        if not out_of_range:
+            roots.append({"range": current_range, "root": x_mid, "iteration": current_iteration})
+    return roots
+
+def newton_raphson(f, df, initial_guesses, epsilon, iteration_max):
+    roots = []
+    found_roots = set()  # Saugome rastų šaknų reikšmes
+    for guess in initial_guesses:
+        current_iteration = 0
+        x_n = guess
+        x_n1 = x_n + epsilon * 2  # Naudojama, kad įeitume į while ciklą
+        interval = {"xMin": x_n, "xMax": x_n}  # Intervalas pradedamas nuo pradinio spėjimo
+        while np.abs(x_n - x_n1) > epsilon or np.abs(f(x_n)) > epsilon:
+            current_iteration += 1
+            if current_iteration > iteration_max:
+                print(f"Newton-Raphson method has reached the maximum iteration count - {iteration_max}")
+                break
+            x_n1 = x_n - f(x_n) / df(x_n)
+            x_n = x_n1
+            interval["xMin"] = min(interval["xMin"], x_n)
+            interval["xMax"] = max(interval["xMax"], x_n)
+            if x_n < xmin or x_n > xmax:
+                break
+        else:
+            if x_n >= xmin and x_n <= xmax and round(x_n, 8) not in found_roots:
+                roots.append({"range": interval, "root": x_n, "iteration": current_iteration})
+                found_roots.add(round(x_n, 8))
+    return roots
+
+   
+if __name__ == "__main__":
+    eps = 1e-12     
+    nitmax = 50     
+    xmin = -2.9     
+    xmax = 4.27 
+    step = 0.3 
+
+    dx = 0.05 
+    x = np.arange(xmin, xmax + dx, dx)    
+    y = fx(x) 
+ 
+    plt.title("Daugianaris 2.19x^4 - 5.17x^3 - 7.17x^2 + 15.14x + 1.21")     
+    plt.xlabel("X")     
+    plt.ylabel("Y")     
+    plt.plot(x, y) 
+    plt.grid(color='black', linestyle="-", linewidth=0.5) 
+ 
+RootIntervals = root_intervals(fx, xmin, xmax, step) 
+for item in RootIntervals: 
+    print(f"Range : [{item['xMin']} ; {item['xMax']}]")
+for item in RootIntervals:
+    plt.plot([item['xMin'], item['xMax']], [0, 0], 'ro')
+
+coefficients = [2.19, -5.17, -7.17, 15.14, 1.21]     
+real_roots = np.roots(coefficients) 
+print("Šaknys, naudojant numpy.roots", real_roots)
+
+chords_roots = chords(fx, RootIntervals, eps, nitmax)     
+print("Stygų metodas")     
+
+for root in chords_roots: 
+    print( f"Range : [{root['range']['xMin']} ; {root['range']['xMax']} ], root - {round(root['root'], 8)}, function value at root " f"point = {fx(root['root'])}, iteration = {root['iteration']}") 
+    
+def df(x):
+    return 8.76 * np.power(x, 3) - 15.51 * np.power(x, 2) - 14.34 * x + 15.14
+    
+initial_guesses = np.arange(xmin, xmax, 0.1)  # Generating initial guesses
+newton_roots = newton_raphson(fx, df, initial_guesses, eps, nitmax)
+
+print("Niutono (liestinių) metodas")
+
+unique_roots = []
+for root in newton_roots:
+    if root['root'] not in [r['root'] for r in unique_roots]:
+        unique_roots.append(root)
+
+for i, root in enumerate(unique_roots):
+    print(f"Root {i + 1}: Range : [{root['range']['xMin']} ; {root['range']['xMax']}], root - {round(root['root'], 8)}, function value at root point = {fx(root['root'])}, iteration = {root['iteration']}") 
+
+
+
+

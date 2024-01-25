@@ -1,0 +1,196 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+import sympy
+#from SkaitiniaiLab1_1_Daugianaris import root_intervals
+
+def root_intervals(f, x_min, x_max, step):
+    intervals = []
+    current_x = x_min
+    while current_x < x_max:
+        if np.sign(f(current_x)) != np.sign(f(current_x + step)):
+            plt.plot([current_x], [0], 'or')
+            plt.plot([current_x + step], [0], 'og')
+            intervals.append({"xMin": round(current_x, 2), "xMax": round(current_x + step, 2)})
+        current_x += step
+    return intervals
+
+class Root_with_differences:
+    def __init__(self, root):
+        self.root = root
+        self.differences = []
+        
+    def graph_b(self):
+        plt.figure()
+        plt.plot(range(len(self.differences)), self.differences)
+        plt.xlabel("TE eilė")
+        plt.ylabel("Skirtumas tarp hx ir artimiausios TE šaknies")
+        plt.title(f"{self.root} Šaknies pagerėjimo grafikas")
+        plt.grid()
+        plt.show()
+def hx(x):
+    return -2 * np.cos(x) + np.cos(4 * x) + 2
+    
+def dhx(x):
+    return 2 * np.sin(x) - 4 * np.sin(4 * x)
+
+
+def newton(f, df, close_points, eps):
+    roots = []
+    for point in close_points:
+        xi = point
+        while math.fabs(f(xi)) > eps:
+            xi = xi - (f(xi) / df(xi))
+        roots.append(xi)
+    return roots
+
+
+def check_for_close_roots(f, roots, eps, x_min, x_max, step):
+    x = sympy.symbols('x')
+    df = f.diff(x)
+    df_lamdified = sympy.lambdify(x, df, 'numpy')
+    f_lambdified = sympy.lambdify(x, f, 'numpy')
+    intervals = root_intervals(f_lambdified, x_min, x_max, step)
+    close_points_arr = []
+    for interval in intervals:
+        close_points_arr.append(interval['xMin'])
+    plt.clf()
+    newton_roots = newton(f_lambdified, df_lamdified, close_points_arr, eps)
+    count_close_roots = 0
+    for root in roots:
+        for newton_root in newton_roots:
+            if math.fabs(newton_root - root) <= eps:
+                count_close_roots += 1
+                plt.plot([newton_root], [0], 'or')
+                plt.plot([root], [0], 'og')
+                break
+    return count_close_roots
+
+
+def get_all_roots(f, x_min, x_max, step):
+    x = sympy.symbols('x')
+    f_lambdified = sympy.lambdify(x, f, 'numpy')
+    return len(root_intervals(f_lambdified, x_min, x_max, step))
+
+
+def find_differences_between_roots(f, roots, eps, x_min, x_max, step):
+    differences = []
+    x = sympy.symbols('x')
+    df = f.diff()
+    df_lambdified = sympy.lambdify(x, df, 'numpy')
+    f_lambdified = sympy.lambdify(x, f, 'numpy')
+    intervals = root_intervals(f_lambdified, x_min, x_max, step)
+    close_points = []
+    for interval in intervals:
+        close_points.append(interval['xMin'])
+    newton_roots = newton(f_lambdified, df_lambdified, close_points, eps)
+    for root in roots:
+        min = x_max-x_min
+        for newton_root in newton_roots:
+            temp = math.fabs(newton_root-root)
+            if temp < min:
+                min = temp
+        if min == x_max-x_min:
+            min = 0
+        differences.append({"root": root, "min_diff": min})
+    return differences
+
+
+def taylor(function, x0, roots, eps, x_min, x_max, step):
+    x, f, fp = sympy.symbols(('x', 'f', 'fp'))
+    all_roots_found = []
+    all_differences_for_roots = []
+    for root in roots:
+        all_differences_for_roots.append(Root_with_differences(root))
+    x_vals = np.arange(x_min, x_max + step, step)
+    f = function
+    f_lambdified = sympy.lambdify(x, function, 'numpy')
+    f_values = f_lambdified(x_vals)
+    max_iteration = 100
+    fp = f.subs(x, x0)
+    i = 0
+    while i < max_iteration + 1 and len(roots) != check_for_close_roots(fp, roots, eps, x_min, x_max, step):
+        i += 1
+        f = f.diff(x)
+        fp = fp + f.subs(x, x0) / math.factorial(i) * (x - x0) ** i
+        
+        all_roots_found.append(get_all_roots(fp, x_min, x_max, step))
+        differences = find_differences_between_roots(fp, roots, eps, x_min, x_max, step)
+        for difference in differences:
+            for all_differences_for_root in all_differences_for_roots:
+                if difference["root"] == all_differences_for_root.root:
+                    all_differences_for_root.differences.append(difference["min_diff"])
+                    
+        # Plotting the function - tarpiniai
+        """plt.xlim([-2, 2])
+        plt.ylim([-5, 5])
+        fp_lambdified = sympy.lambdify(x, fp, 'numpy')
+        fp_values = np.array([fp_lambdified(val) for val in x_vals])
+        plt.plot(x_vals, fp_values, label=f'TE - {i}' )
+        plt.plot(x_vals, f_values, label='-2cos(x)+cos(4)+2')
+        plt.plot([x0], [0], 'om', label="mid")
+        plt.legend()
+        plt.grid()
+        plt.show()"""
+
+        fp_lambdified = sympy.lambdify(x, fp, 'numpy')
+        fp_values = np.array([fp_lambdified(val) for val in x_vals])
+        plt.plot(x_vals, f_values, label='-2cos(x)+cos(4)+2')
+        plt.plot(x_vals, fp_values, label=f'TE - {i}')
+        plt.xlim([-2, 2])
+        plt.ylim([-5, 5])
+        plt.plot([x0], [0], 'om', label="mid")
+        plt.legend()
+        plt.grid()
+        print(f"daugianario išraiška - {fp}")
+        plt.show()
+        graph_a(all_roots_found) # Rastų šaknų priklausomybe nuo TE eilės
+
+        for root_with_diff in all_differences_for_roots: # Kiekvienos šaknies pagerėjimų grafikai
+            root_with_diff.graph_b()
+    
+    return fp_lambdified  # Move this line outside of the while loop
+
+
+
+
+
+def graph_a(roots_count):
+    plt.figure()
+    plt.plot(range(len(roots_count)), roots_count)
+    plt.xlabel("TE eilė")
+    plt.ylabel("Šaknų skaičius")
+    plt.title("Rastų šaknų skaičiaus priklausomybe nuo TE eilės")
+    plt.grid()
+    plt.show()
+
+
+# bendri kintamieji
+dx = 0.01
+h = 0.1
+x_max = 2
+x_min = -2
+mid = (x_max + x_min) / 2
+eps = 1e-12
+eps2 = 1e-4
+all_x = np.arange(x_min, x_max + dx, dx)
+all_y = hx(all_x)
+
+# randame artinius
+intervals = root_intervals(hx, x_min, x_max, h)
+close_points = []
+for item in intervals:
+    print(f"Artinys : {item['xMin']}")
+    close_points.append(item["xMin"])
+    
+# niutono metodu randame hx šaknis
+h_function_roots = newton(hx, dhx, close_points, eps)
+print("-2*cos(x) + cos(4x) + 2 šaknys Niutono metodu")
+for root in h_function_roots:
+    print(root)
+    
+# teiloro eilute
+x, f = sympy.symbols(('x', 'f'))
+f = -2 * sympy.cos(x) + sympy.cos(4 * x) + 2
+
+taylor(f, mid, h_function_roots, eps2, x_min, x_max, dx)

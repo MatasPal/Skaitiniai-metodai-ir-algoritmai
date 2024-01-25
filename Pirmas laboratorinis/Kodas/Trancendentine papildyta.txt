@@ -1,0 +1,112 @@
+import numpy as np
+import matplotlib.pyplot as plt
+import math
+from scipy.optimize import fsolve
+#from LAB1_Daugianaris.ipynb import root_intervals, bisection, chords
+def root_intervals(f, x_min, x_max, h):
+    intervals = []
+    x_start = x_min
+    while x_start < x_max:
+        x_end = x_start + h
+        if np.sign(f(x_start)) != np.sign(f(x_end)):
+            plt.plot([x_start], [0], 'or')
+            plt.plot([x_end], [0], 'og')
+            intervals.append({"xMin": round(x_start, 2), "xMax": round(x_end, 2)})
+        x_start = x_end
+    return intervals
+def gx(x):
+    #return np.power(math.e, -np.power(x/2,2)) np.sin(2x)
+    return np.exp(-np.power(x / 2, 2)) * np.sin(2 * x)
+def bisection(f, current_range, epsilon, iteration_max):
+    roots = []     
+    out_of_range = False         
+    current_iteration = 0 
+    x_min = float(current_range["xMin"])         
+    x_max = float(current_range["xMax"])         
+    x_mid = (x_max + x_min) / 2 
+    x_mid_n1 = x_mid + epsilon * 2  # used to enter while for the first time         
+    while np.abs(x_mid - x_mid_n1) > epsilon or np.abs(f(x_mid)) > epsilon:  # absoliutinis sprendinio tikslumo ivertis             
+        current_iteration += 1             
+        if current_iteration > iteration_max: 
+            print(f"Bisection method has reached the maximum iteration count - {iteration_max}") 
+            roots.append({"range": current_range, "root": x_mid, "iteration": iteration_max})  # Include the iteration count                 
+            out_of_range = True                 
+            break             
+        if np.sign(f(x_min)) == np.sign(f(x_mid)): 
+            x_min = x_mid             
+        else: 
+            x_max = x_mid             
+            x_mid_n1 = x_mid             
+            x_mid = (x_max + x_min) / 2         
+    if not out_of_range:
+        roots.append({"range": current_range, "root": x_mid, "iteration": current_iteration})
+    return roots
+ 
+def chords(f, current_range, epsilon, iteration_max):
+    roots = []     
+    out_of_range = False         
+    current_iteration = 0 
+    x_min = float(current_range["xMin"])         
+    x_max = float(current_range["xMax"])         
+    k = np.abs(f(x_min) / f(x_max))         
+    x_mid = (x_min + k * x_max) / (1 + k) 
+    x_mid_n1 = x_mid + epsilon * 2  # used to enter while for the first time         
+    while np.abs(x_mid - x_mid_n1) > epsilon or np.abs(f(x_mid)) > epsilon:  # absoliutinis sprendinio tikslumo ivertis             
+        current_iteration += 1             
+        if current_iteration > iteration_max: 
+            print(f"Chords method has reached the maximum iteration count - {iteration_max}") 
+            roots.append({"range": current_range, "root": x_mid, "iteration": iteration_max})  # Include the iteration count                 
+            out_of_range = True                 
+            break             
+        if np.sign(f(x_min)) == np.sign(f(x_mid)): 
+            x_min = x_mid             
+        else: 
+            x_max = x_mid             
+            k = np.abs(f(x_min) / f(x_max))             
+            x_mid_n1 = x_mid             
+            x_mid = (x_min + k * x_max) / (1 + k)         
+    if not out_of_range:
+        roots.append({"range": current_range, "root": x_mid, "iteration": current_iteration})
+    return roots
+step = 0.1
+eps = 1e-12
+nitmax = 100
+dx = 0.05
+xmin = -6
+xmax = 6
+
+x = np.arange(xmin, xmax + dx, dx)
+y = gx(x)
+
+plt.plot(x, y)
+plt.title("Transcedentinė funkcija e^-(x/2)^2 sin(2x)")
+plt.xlabel("X")
+plt.ylabel("Y")
+plt.grid(color='black', linestyle="-", linewidth=0.5)
+
+RootIntervals = root_intervals(gx, xmin, xmax, step) 
+for item in RootIntervals: 
+    print(f"Range : [{item['xMin']} ; {item['xMax']}]")
+for item in root_intervals_list:  # Rename the list
+    print(f"Range : [{item['xMin']} ; {item['xMax']}]")
+    bisection_roots = bisection(gx, item, eps, nitmax)
+    print("Pusiaukirtos metodas")
+    for root in bisection_roots:
+        print(
+            f"Range : [{root['range']['xMin']} ; {root['range']['xMax']} ], root - "
+            f"{round(root['root'], 8)}, function value at root point = {gx(root['root'])}, iteration = {root['iteration']}"
+        )
+
+    chords_roots = chords(gx, item, eps, nitmax)
+    print("Stygų metodas")
+    for root in chords_roots:
+        print(
+            f"Range : [{root['range']['xMin']} ; {root['range']['xMax']} ], root - "
+            f"{round(root['root'], 8)}, function value at root point = {gx(root['root'])}, iteration = {root['iteration']}"
+        )
+
+    print("Šaknys, naudojant scipy.optimize.fsolve: ")
+    for current_range in root_intervals_list:  # Rename the list
+        print(fsolve(gx, current_range["xMin"], xtol=1e-12))
+
+plt.show()

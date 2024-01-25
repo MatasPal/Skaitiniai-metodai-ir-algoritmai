@@ -1,0 +1,103 @@
+import numpy as np 
+import matplotlib.pyplot as plt 
+import math 
+def fx(x):
+    return 0.7 * np.power(x, 4) - 4.16 * np.power(x, 3) - 1.19 * np.power(x, 2) + 33.4 * x - 31.51 
+def root_intervals(f, x_min, x_max, h):
+    intervals = [] 
+    while x_min < x_max:
+        if np.sign(f(x_min)) != np.sign(f(x_min + h)): 
+            plt.plot([x_min], [0], 'or')             
+            plt.plot([x_min + h], [0], 'og') 
+            intervals.append({"xMin": round(x_min, 2), "xMax": round(x_min + h, 2)}) 
+            x_min += h 
+        return intervals 
+    def bisection(f, ranges, epsilon, iteration_max): 
+        roots = []     
+        for current_range in ranges:
+            out_of_range = False         
+            current_iteration = 0 
+            x_min = float(current_range["xMin"])         
+            x_max = float(current_range["xMax"])         
+            x_mid = (x_max + x_min) / 2 
+            x_mid_n1 = x_mid + epsilon * 2  # used to enter while for the first time         
+            while np.abs(x_mid-x_mid_n1) > epsilon or np.abs(f(x_mid)) > epsilon: #absoliutinis sprendinio tikslumo ivertis             
+                current_iteration += 1             
+                if current_iteration > iteration_max: 
+                    print(f"Bisection method has reached the maximum iteration count - {iteration_max}") 
+                    roots.append({"range": current_range, "root": x_mid})                 
+                    out_of_range = True                 
+                    break             
+                    if np.sign(f(x_min)) == np.sign(f(x_mid)): 
+                        x_min = x_mid             
+                    else: 
+                        x_max = x_mid             
+                        x_mid_n1 = x_mid             
+                        x_mid = (x_max + x_min) / 2         
+                    if not out_of_range:             
+                        roots.append({"range": current_range, "root": x_mid, "iteration": current_iteration})     
+                        return roots 
+def chords(f, ranges, epsilon, iteration_max): 
+    roots = []     
+    for current_range in ranges:         
+        out_of_range = False         
+        current_iteration = 0 
+        x_min = float(current_range["xMin"])         
+        x_max = float(current_range["xMax"])         
+        k = np.abs(f(x_min)/f(x_max))         
+        x_mid = (x_min+k*x_max)/(1+k) 
+        x_mid_n1 = x_mid + epsilon * 2  # used to enter while for the first time         
+        while np.abs(x_mid - x_mid_n1) > epsilon or np.abs( f(x_mid)) > epsilon:  # absoliutinis sprendinio tikslumo ivertis             
+            current_iteration += 1             
+            if current_iteration > iteration_max: 
+                print(f"Chords method has reached the maximum iteration count - {iteration_max}") 
+                roots.append({"range": current_range, "root": x_mid})                 
+                out_of_range = True                 
+                break             
+                if np.sign(f(x_min)) == np.sign(f(x_mid)): 
+                    x_min = x_mid             
+                else: 
+                    x_max = x_mid             
+                    x_mid_n1 = x_mid 
+                    k = np.abs(f(x_min) / f(x_max))             
+                    x_mid = (x_min + k * x_max) / (1 + k)         
+                if not out_of_range: 
+                    roots.append({"range": current_range, "root": x_mid, "iteration": current_iteration})     
+                    return roots 
+if __name__ == "__main__":
+    eps = 1e-12     
+    nitmax = 50     
+    xmin = -3.5     
+    xmax = 6 
+    step = 0.3 
+
+    dx = 0.05 
+    x = np.arange(xmin, xmax + dx, dx)    
+    y = fx(x) 
+ 
+    plt.title("Daugianaris 0.7x^4 - 4.16x^3 - 1.19x^2 + 33.4x - 31.51")     
+    plt.xlabel("X")     
+    plt.ylabel("Y")     
+    plt.plot(x, y) 
+    plt.grid(color='black', linestyle="-", linewidth=0.5) 
+ 
+    RootIntervals = root_intervals(fx, xmin, xmax, step) 
+    for item in RootIntervals: 
+        print(f"Range : [{item['xMin']} ; {item['xMax']}]") 
+        bisection_roots = bisection(fx, RootIntervals, eps, nitmax) 
+ 
+        coefficients = [0.7, -4.16, -1.19, 33.4, -31.51]     
+        real_roots = np.roots(coefficients) 
+        print("Šaknys, naudojant numpy.roots", real_roots) 
+        print("Pusiaukirtos metodas")     
+        for root in bisection_roots: 
+            print( 
+            f"Range : [{root['range']['xMin']} ; {root['range']['xMax']} ], root - "
+f"{round(root['root'], 8)}, function value at root point = {fx(root['root'])}, iteration = {root['iteration']}")
+ 
+ 
+        chords_roots = chords(fx, RootIntervals, eps, nitmax)     
+        print("Stygų metodas")     
+        for root in chords_roots: 
+            print( f"Range : [{root['range']['xMin']} ; {root['range']['xMax']} ], root - {round(root['root'], 8)}, function value at root " f"point = {fx(root['root'])}, iteration = {root['iteration']}") 
+            plt.show()
