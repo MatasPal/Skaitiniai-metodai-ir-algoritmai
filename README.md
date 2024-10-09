@@ -1,16 +1,16 @@
-# Skaitiniai metodai ir algoritmai
+# Numerical Methods and Algorithms
 
-## Aprašymas
+## Description
 
-Šiame repozitorijoje saugomi **Skaitiniai metodai ir algoritmai** modulio laboratoriniai darbai, atlikti studijuojant KTU. Laboratoriniai darbai apima įvairius skaitinius metodus ir algoritmus, kurie naudojami sudėtingoms matematinėms ir inžinerinėms problemoms spręsti.
+This repository contains the laboratory work for the **Numerical Methods and Algorithms** module, completed during studies at KTU. The laboratory work covers various numerical methods and algorithms used to solve complex mathematical and engineering problems.
 
-## Turinys
+## Content
 
-Kiekviename kataloge pateikiami laboratoriniai darbai, jų užduotys ir sprendimai, įgyvendinti naudojant skaitinius metodus ir algoritmus. Pagrindinės temos apima:
+Each directory contains laboratory work, their tasks, and solutions implemented using numerical methods and algorithms. The main topics include:
 
-- **Interpolacija ir aproksimacija**
-- **Integravimas ir diferencijavimas**
-- **Lygčių sprendimo metodai**
-- **Matricų operacijos**
-- **Optimizacijos metodai**
-- Ir kitos su skaitiniais metodais susijusios temos.
+- **Interpolation and approximation**
+- **Integration and differentiation**
+- **Equation solving methods**
+- **Matrix operations**
+- **Optimization methods**
+- And other topics related to numerical methods.
